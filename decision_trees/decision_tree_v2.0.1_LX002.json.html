@@ -1,0 +1,171 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Decision tree</title>
+<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.4/dagre-d3.min.js"></script>
+
+<style id="css">
+  body {
+    font: 300 14px 'Helvetica Neue', Helvetica;
+  }
+
+  .node rect,
+  .node circle,
+  .node ellipse {
+    stroke: #333;
+    fill: #fff;
+    stroke-width: 1px;
+  }
+
+  .edgePath path {
+    stroke: #333;
+    fill: #333;
+    stroke-width: 1.5px;
+  }
+</style>
+<svg width=2400 height=1600>
+  <g/>
+</svg>
+
+
+<script id="js">
+  // Create a new directed graph
+  var g = new dagreD3.graphlib.Graph().setGraph({})
+
+  g.setNode("bed", {label: "In LX002_v1.0.1 regions?", style: "fill: #33ccff"});
+g.setNode("type", {label: "Is STR?", style: "fill: #33ccff"});
+g.setNode("pick", {label: "is picked transcript", style: "fill: #33ccff"});
+g.setNode("up_downstream", {label: "Up or downstream gene variant", style: "fill: #33ccff"});
+g.setNode("unit", {label: "Called unit equals configured unit", style: "fill: #33ccff"});
+g.setNode("status", {label: "STR mutation status", style: "fill: #33ccff"});
+g.setNode("filter", {label: "Filter pass", style: "fill: #33ccff"});
+g.setNode("vkgl", {label: "VKGL classification", style: "fill: #33ccff"});
+g.setNode("clinVar", {label: "ClinVar classification", style: "fill: #33ccff"});
+g.setNode("chrom", {label: "Chromosome 1-22-X-Y-MT", style: "fill: #33ccff"});
+g.setNode("gene", {label: "Gene exists", style: "fill: #33ccff"});
+g.setNode("sv", {label: "Structural Variant?", style: "fill: #33ccff"});
+g.setNode("str", {label: "Short tandem repeat?", style: "fill: #33ccff"});
+g.setNode("str_status", {label: "Stranger str status (normal, pre_mutation, mutation)", style: "fill: #33ccff"});
+g.setNode("gnomAD", {label: "gnomAD QC filter failure", style: "fill: #33ccff"});
+g.setNode("gnomAD_AF", {label: "gnomAD", style: "fill: #33ccff"});
+g.setNode("annotSV", {label: "AnnotSV classification", style: "fill: #33ccff"});
+g.setNode("spliceAI", {label: "SpliceAI prediction", style: "fill: #33ccff"});
+g.setNode("utr5", {label: "5' UTR", style: "fill: #33ccff"});
+g.setNode("capice", {label: "CAPICE prediction > 0.5", style: "fill: #33ccff"});
+g.setNode("exit_lq", {label: "Low Quality", style: "fill: #00ff00"});
+g.setNode("exit_rm", {label: "Remove", style: "fill: #00ff00"});
+g.setNode("exit_b", {label: "Benign", style: "fill: #00ff00"});
+g.setNode("exit_lb", {label: "Likely Benign", style: "fill: #00ff00"});
+g.setNode("exit_vus", {label: "Uncertain Significance", style: "fill: #00ff00"});
+g.setNode("exit_lp", {label: "Likely Pathogenic", style: "fill: #00ff00"});
+g.setNode("exit_p", {label: "Pathogenic", style: "fill: #00ff00"});
+g.setEdge("capice", "exit_lp", {label: "true"});
+g.setEdge("status", "exit_lb", {label: "normal"});
+g.setEdge("pick", "up_downstream", {label: "true"});
+g.setEdge("type", "filter", {label: "false\nmissing"});
+g.setEdge("clinVar", "chrom", {label: "default\nConflict\nVUS\nmissing"});
+g.setEdge("str_status", "exit_lp", {label: "full_mutation"});
+g.setEdge("capice", "exit_lb", {label: "false"});
+g.setEdge("status", "exit_lp", {label: "full_mutation"});
+g.setEdge("annotSV", "exit_b", {label: "1"});
+g.setEdge("str_status", "exit_vus", {label: "default\npre_mutation"});
+g.setEdge("str", "annotSV", {label: "false\nmissing"});
+g.setEdge("capice", "exit_vus", {label: "missing"});
+g.setEdge("up_downstream", "exit_rm", {label: "true"});
+g.setEdge("gnomAD", "gnomAD_AF", {label: "false"});
+g.setEdge("sv", "spliceAI", {label: "false"});
+g.setEdge("annotSV", "exit_p", {label: "5"});
+g.setEdge("bed", "type", {label: "in region chr19:13206442-13506480\nin region chrX:67544021-67730620\nin region chr14:92044775-92106583\nin region chr12:6924459-6942322\nin region chr3:129167827-129183897\nin region chr2:190880821-190965553\nin region chrX:147911919-147951126\nin region chr19:45769709-45782491\nin region chr12:111452214-111599674\nin region chr14:23321457-23326164\nin region chr13:101710804-102402444\nin region chr16:66427295-66495289\nin region chr5:146580742-147081521\nin region chr8:104489236-104589259\nin region chr1:56994778-58546727\nin region chr13:70107421-70171739\nin region chr19:14477762-14496128\nin region chr10:79691500-79826595\nin region chr3:63863144-64003463\nin region chr20:2652632-2658394\nin region chr6:16299112-16761461\nin region chr9:69035752-69079077\nin region chr12:123470054-123534751\nin region chr1:149390621-149471834\nin region chr6:170554369-170572860\nin region chr22:45671834-45845308\nin region chr4:39287456-39366363"});
+g.setEdge("vkgl", "exit_p", {label: "P"});
+g.setEdge("chrom", "gene", {label: "true\nmissing"});
+g.setEdge("filter", "vkgl", {label: "true\nmissing"});
+g.setEdge("filter", "exit_lq", {label: "false"});
+g.setEdge("clinVar", "exit_lb", {label: "B/LB"});
+g.setEdge("annotSV", "exit_lp", {label: "4"});
+g.setEdge("clinVar", "exit_lp", {label: "LP/P"});
+g.setEdge("gene", "exit_rm", {label: "false"});
+g.setEdge("annotSV", "exit_lb", {label: "2"});
+g.setEdge("spliceAI", "exit_lp", {label: "Delta score (acceptor/donor gain/loss) > 0.42"});
+g.setEdge("utr5", "capice", {label: "false"});
+g.setEdge("gnomAD_AF", "exit_lb", {label: "Filtering allele Frequency (99% confidence) >= 0.02 or Number of Homozygotes > 5"});
+g.setEdge("annotSV", "spliceAI", {label: "default"});
+g.setEdge("status", "exit_vus", {label: "default\npre_mutation"});
+g.setEdge("vkgl", "exit_b", {label: "B"});
+g.setEdge("sv", "str", {label: "true"});
+g.setEdge("gnomAD", "sv", {label: "true"});
+g.setEdge("bed", "exit_rm", {label: "default\nmissing"});
+g.setEdge("vkgl", "clinVar", {label: "default\nVUS"});
+g.setEdge("annotSV", "exit_vus", {label: "3"});
+g.setEdge("chrom", "exit_rm", {label: "false"});
+g.setEdge("vkgl", "exit_lb", {label: "LB"});
+g.setEdge("up_downstream", "unit", {label: "false\nmissing"});
+g.setEdge("unit", "exit_vus", {label: "false\nmissing"});
+g.setEdge("utr5", "exit_vus", {label: "true"});
+g.setEdge("gene", "gnomAD", {label: "true"});
+g.setEdge("unit", "status", {label: "true"});
+g.setEdge("spliceAI", "utr5", {label: "default\nmissing"});
+g.setEdge("vkgl", "exit_lp", {label: "LP"});
+g.setEdge("str", "str_status", {label: "true"});
+g.setEdge("pick", "exit_rm", {label: "false\nmissing"});
+g.setEdge("str_status", "exit_lb", {label: "normal"});
+g.setEdge("type", "pick", {label: "true"});
+g.setEdge("gnomAD_AF", "sv", {label: "default\nmissing"});
+g.setEdge("spliceAI", "exit_vus", {label: "Delta score (acceptor/donor gain/loss) > 0.13"});
+
+
+  var svg = d3.select('svg'),
+    inner = svg.select('g')
+
+  var zoom = d3.zoom().on('zoom', function () {
+    inner.attr('transform', d3.event.transform)
+  })
+  svg.call(zoom)
+  var render = new dagreD3.render()
+  render(inner, g)
+  var initialScale = 1
+  svg.call(zoom.transform,
+    d3.zoomIdentity.translate((svg.attr('width') - g.graph().width * initialScale) / 2, 20).scale(
+      initialScale))
+
+  svg.attr('height', g.graph().height * initialScale + 40)
+
+</script>
+<script>
+  (function () {
+    var ws = new WebSocket(
+      'ws://' + window.location.host + '/jb-server-page?reloadServiceClientId=3')
+    ws.onmessage = function (msg) {
+      if (msg.data === 'reload') {
+        window.location.reload()
+      }
+      if (msg.data.startsWith('update-css ')) {
+        var messageId = msg.data.substring(11)
+        var links = document.getElementsByTagName('link')
+        for (var i = 0; i < links.length; i++) {
+          var link = links[i]
+          if (link.rel !== 'stylesheet') {
+            continue
+          }
+          var clonedLink = link.cloneNode(true)
+          var newHref = link.href.replace(/(&|\?)jbUpdateLinksId=\d+/,
+            '$1jbUpdateLinksId=' + messageId)
+          if (newHref !== link.href) {
+            clonedLink.href = newHref
+          } else {
+            var indexOfQuest = newHref.indexOf('?')
+            if (indexOfQuest >= 0) {
+              // to support ?foo#hash
+              clonedLink.href = newHref.substring(0, indexOfQuest + 1) + 'jbUpdateLinksId='
+                + messageId + '&' +
+                newHref.substring(indexOfQuest + 1)
+            } else {
+              clonedLink.href += '?' + 'jbUpdateLinksId=' + messageId
+            }
+          }
+          link.replaceWith(clonedLink)
+        }
+      }
+    }
+  })()
+</script>
