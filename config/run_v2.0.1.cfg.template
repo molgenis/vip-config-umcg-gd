@@ -22,7 +22,7 @@ params {
   }
   vcf {
     annotate.GRCh38.stranger_catalog = "$EBROOTVIPMINUMCGMINCONFIGMINGD/catalog/VIP_catalog_v1.7.2.json"
-    classify.GRCh38.decision_tree = "$EBROOTVIPMINUMCGMINCONFIGMINGD/decision_trees/decision_tree_v2.0.0_${VIP_CONFIG_TEST_CODE}.json"
+    classify.GRCh38.decision_tree = "$EBROOTVIPMINUMCGMINCONFIGMINGD/decision_trees/decision_tree_v2.0.1_${VIP_CONFIG_TEST_CODE}.json"
     filter.classes = "B,LB,VUS,LP,P"
     filter_samples.classes = "U1,U2,U3"
   }
